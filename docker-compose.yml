@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    networks:
+      - osds
+    image: postgres:16
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_DB=hive_metastore
+      - POSTGRES_USER=hive
+      - POSTGRES_PASSWORD=hivepass123
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"  # PostgreSQL default port
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data  # Use a named volume for persistent data
+
+  hive-metastore:
+    image: apache/hive:4.0.0-alpha-2
+    networks:
+      - osds
+    environment:
+      - SERVICE_NAME=metastore
+      - DB_DRIVER=postgres
+      - SERVICE_OPTS=-Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://postgres:5432/hive_metastore -Djavax.jdo.option.ConnectionUserName=hive -Djavax.jdo.option.ConnectionPassword=hivepass123
+    ports:
+      - "9083:9083"
+    volumes:
+      - ./data/delta/osdp/spark-warehouse:/opt/spark/work-dir/data/delta/osdp/spark-warehouse
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
+  warehouse:
+
+networks:
+  osds:
