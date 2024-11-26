@@ -4,6 +4,8 @@ services:
     image: postgres:11
     hostname: metastore_db
     container_name: metastore_db
+    ports:
+      - '5432:5432'
     environment:
       POSTGRES_USER: hive
       POSTGRES_PASSWORD: hive
@@ -13,7 +15,7 @@ services:
   hive-metastore:
     container_name: hive-metastore
     hostname: hive-metastore
-    image: 'starburstdata/hive:3.1.2-e.15'
+    image: 'starburstdata/hive:3.1.2-e.18'
     ports:
       - '9083:9083' # Metastore Thrift
     environment:
@@ -40,6 +42,7 @@ services:
       AZURE_ABFS_OAUTH_SECRET: ""
       AZURE_ABFS_OAUTH_ENDPOINT: ""
       AZURE_WASB_ACCESS_KEY: ""
+      HIVE_METASTORE_USER_IN_ADMIN_ROLE: "admin"
     depends_on:
       - metastore_db
 
@@ -77,3 +80,14 @@ services:
       - ./notebooks:/home/jovyan/work
     environment:
       JUPYTER_ENABLE_LAB: "yes"
+  
+  trino:
+    image: trinodb/trino
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./trino/etc:/etc/trino
+
+  
+volumes:
+  trino-data:
