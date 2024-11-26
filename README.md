@@ -1,30 +1,9 @@
 ```python
 from pyspark.sql import SparkSession
 
-packages = [
-    # Iceberg
-    "org.apache.iceberg:iceberg-spark-runtime-3.4_2.12:1.4.2",
-    
-    # AWS & Hadoop
-    "org.apache.hadoop:hadoop-aws:3.3.4",
-    "org.apache.hadoop:hadoop-common:3.3.4",
-    "org.apache.hadoop:hadoop-client-api:3.3.4",
-    "org.apache.hadoop:hadoop-client-runtime:3.3.4",
-    "com.amazonaws:aws-java-sdk-bundle:1.12.261",
-    
-    # Hive Metastore EMR version
-    "org.apache.hive:hive-metastore:3.1.3",
-    "org.apache.hive:hive-exec:3.1.3",
-    "org.apache.hive:hive-common:3.1.3",
-    
-    # Data formats
-    "org.apache.parquet:parquet-hadoop-bundle:1.12.3",
-    "org.apache.orc:orc-core:1.9.1"
-]
-
 spark = SparkSession.builder \
     .appName("IcebergApp") \
-    .config("spark.jars.packages", ",".join(packages)) \
+    .config("spark.jars.dir", "/usr/local/spark/jars") \
     .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
     .config("spark.sql.catalogImplementation", "hive") \
     .config("spark.sql.catalog.iceberg", "org.apache.iceberg.spark.SparkCatalog") \
