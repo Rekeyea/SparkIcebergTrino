@@ -60,7 +60,7 @@ spark = SparkSession.builder \
 
 ```python
 # Create Database
-spark.sql("CREATE DATABASE iceberg.testdb")
+spark.sql("CREATE DATABASE iceberg.testdb").show()
 ```
 
 ```python
