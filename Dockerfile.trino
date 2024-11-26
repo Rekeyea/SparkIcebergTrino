@@ -1,8 +1,0 @@
-FROM trinodb/trino:latest
-
-# Download additional connector dependencies
-RUN cd /usr/lib/trino/plugin/iceberg && \
-    curl -L -O https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar && \
-    curl -L -O https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.261/aws-java-sdk-bundle-1.12.261.jar && \
-    curl -L -O https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-core/1.4.2/iceberg-core-1.4.2.jar && \
-    curl -L -O https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-hive-metastore/1.4.2/iceberg-hive-metastore-1.4.2.jar
