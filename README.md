@@ -12,9 +12,9 @@ packages = [
     "com.amazonaws:aws-java-sdk-bundle:1.12.261",
     
     # Hive Metastore EMR version
-    "org.apache.hive:hive-metastore:3.1.2",
-    "org.apache.hive:hive-exec:3.1.2",
-    "org.apache.hive:hive-common:3.1.2",
+    "org.apache.hive:hive-metastore:3.1.3",
+    "org.apache.hive:hive-exec:3.1.3",
+    "org.apache.hive:hive-common:3.1.3",
     
     # Data formats
     "org.apache.parquet:parquet-hadoop-bundle:1.12.3",
@@ -56,6 +56,9 @@ spark = SparkSession.builder \
     .enableHiveSupport() \
     .getOrCreate()
 
+# Create Database
+spark.sql("CREATE DATABASE iceberg.testdb")
+
 # Create new table
 spark.sql("""
     CREATE TABLE iceberg.testdb.test_table (
@@ -73,6 +76,7 @@ spark.sql("""
         (3, 'data3')
 """).show()
 
+# Query Data
 spark.sql("""
     SELECT * FROM iceberg.testdb.test_table
 """).show()
