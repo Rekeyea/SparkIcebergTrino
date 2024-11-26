@@ -1,3 +1,4 @@
+```python
 from pyspark.sql import SparkSession
 
 packages = [
@@ -55,10 +56,14 @@ spark = SparkSession.builder \
     \
     .enableHiveSupport() \
     .getOrCreate()
+```
 
+```python
 # Create Database
 spark.sql("CREATE DATABASE iceberg.testdb")
+```
 
+```python
 # Create new table
 spark.sql("""
     CREATE TABLE iceberg.testdb.test_table (
@@ -66,7 +71,9 @@ spark.sql("""
         data string)
     USING iceberg
 """).show()
+```
 
+```python
 # Insert data using SQL
 spark.sql("""
     INSERT INTO iceberg.testdb.test_table
@@ -75,8 +82,11 @@ spark.sql("""
         (2, 'data2'),
         (3, 'data3')
 """).show()
+```
 
+```python
 # Query Data
 spark.sql("""
     SELECT * FROM iceberg.testdb.test_table
 """).show()
+```
