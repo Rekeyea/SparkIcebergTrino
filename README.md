@@ -79,6 +79,10 @@ mysql -h 127.0.0.1 -P 9030 -u root
 ```
 
 ```SQL
+SET enable_file_cache = false;
+```
+
+```SQL
 CREATE CATALOG iceberg
 PROPERTIES (
     "type"="hms",
@@ -90,7 +94,6 @@ PROPERTIES (
     "AWS_REGION" = "us-east-1",
     "AWS_ACCESS_KEY" = "minio",
     "AWS_SECRET_KEY" = "minio123",
-    "use_path_style" = "true",
-    "metadata_refresh_interval_sec"="10"
+    "use_path_style" = "true"
 );
 ```
