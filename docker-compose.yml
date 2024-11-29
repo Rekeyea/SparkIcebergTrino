@@ -10,6 +10,9 @@ services:
       POSTGRES_USER: hive
       POSTGRES_PASSWORD: hive
       POSTGRES_DB: metastore
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.10
 
   # Hive metastore service (HMS)
   hive-metastore:
@@ -45,6 +48,9 @@ services:
       HIVE_METASTORE_USER_IN_ADMIN_ROLE: "admin"
     depends_on:
       - metastore_db
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.11
 
   # MinIO object storage
   minio:
@@ -58,6 +64,9 @@ services:
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123
     command: server /data --console-address ":9001"
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.12
 
   # This job creates the "datalake" bucket on Minio
   mc-job:
@@ -71,6 +80,9 @@ services:
       "
     depends_on:
       - minio
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.13
   
   jupyter:
     build: .
@@ -80,6 +92,9 @@ services:
       - ./notebooks:/home/jovyan/work
     environment:
       JUPYTER_ENABLE_LAB: "yes"
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.14
   
   trino:
     image: trinodb/trino
@@ -87,7 +102,70 @@ services:
       - '8080:8080'
     volumes:
       - ./trino/etc:/etc/trino
-
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.15
   
+  doris-fe:
+    image: apache/doris:doris-fe-2.1.7
+    hostname: doris-fe
+    environment:
+      - FE_SERVERS=fe1:172.20.0.2:9010
+      - FE_ID=1
+      - PRIORITY_NETWORKS=172.20.0.0/24
+    volumes:
+      - doris-fe-meta:/opt/apache-doris/fe/doris-meta/
+      - doris-fe-log:/opt/apache-doris/fe/log/
+    ports:
+      - "18030:8030"  # Changed from 8030:8030
+      - "19020:9020"  # Changed from 9020:9020
+      - "19030:9030"  # Changed from 9030:9030
+      - "19010:9010"  # Changed from 9010:9010
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.2
+    extra_hosts:
+      - "hive-metastore:172.20.0.11"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://172.20.0.2:8030"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  doris-be:
+    image: apache/doris:doris-be-2.1.7
+    hostname: doris-be
+    environment:
+      - FE_SERVERS=fe1:172.20.0.2:9010
+      - BE_ADDR=172.20.0.3:9050
+      - PRIORITY_NETWORKS=172.20.0.0/24
+    volumes:
+      - doris-be-storage:/opt/apache-doris/be/storage/
+      - doris-be-script:/docker-entrypoint-initdb.d/
+    ports:
+      - "19050:9050"  # Changed from 9050:9050
+      - "19060:9060"  # Changed from 9060:9060
+      - "19070:9070"  # Changed from 9070:9070
+    depends_on:
+      doris-fe:
+        condition: service_healthy
+    networks:
+      doris_net:
+        ipv4_address: 172.20.0.3
+    ulimits:
+      nofile:
+        soft: 655350
+        hard: 655350
+
+networks:
+  doris_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
 volumes:
-  trino-data:
+  doris-fe-meta:
+  doris-fe-log:
+  doris-be-storage:
+  doris-be-script:

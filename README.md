@@ -69,3 +69,28 @@ spark.sql("""
     SELECT * FROM iceberg.testdb.test_table
 """).show()
 ```
+
+------------------
+
+# Doris Configuration
+
+``` bash
+mysql -h 127.0.0.1 -P 9030 -u root
+```
+
+```SQL
+CREATE CATALOG iceberg
+PROPERTIES (
+    "type"="hms",
+    "hive.metastore.uris" = "thrift://hive-metastore:9083",
+    "iceberg.catalog.type"="hms",
+    "hadoop.username" = "hive",
+    "warehouse" = "s3://datalake/warehouse",
+    "AWS_ENDPOINT" = "http://172.20.0.12:9000",
+    "AWS_REGION" = "us-east-1",
+    "AWS_ACCESS_KEY" = "minio",
+    "AWS_SECRET_KEY" = "minio123",
+    "use_path_style" = "true",
+    "metadata_refresh_interval_sec"="10"
+);
+```
