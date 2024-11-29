@@ -1,3 +1,5 @@
+# Spark Configuration
+
 ```python
 from pyspark.sql import SparkSession
 
